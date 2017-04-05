@@ -1,0 +1,27 @@
+<div class="modal fade in">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button (click)="close()" class="close">
+          <span>×</span>
+        </button>
+        <h3 class="modal-title">
+          {{title}}
+        </h3>
+        <h4>{{group.name}}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <div class="input-group">
+            <h4 class="example-title">Название</h4>
+            <input [(ngModel)]="group.name" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button (click)="save(group)" class="btn btn-primary">Сохранить</button>
+          <button (click)="close()" class="btn btn-default">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

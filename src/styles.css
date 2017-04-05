@@ -1,1 +1,48 @@
-/* You can add global styles to this file, and also import other style files */
+.page{
+    background-color: #F1F4F5;
+    padding: 10px 20% 0 20%;
+    height: 100% !important; 
+}
+body{
+    background-color: #F1F4F5;
+}
+.row-buttons > button{
+    margin: 0;
+}
+.row-buttons:first-child{
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.modal{
+    display: block;
+}
+.panel-body{
+    padding-left: 0;
+    padding-right: 0;
+}
+textarea:focus, input:focus, button:focus, span:focus{
+    outline: none !important;
+}
+.page-header{
+    padding-left: 10px;
+}
+.horizontal{
+    display: flex;
+    flex-direction: row;
+}
+.horizontal >div{
+    margin-left: 10px;
+}
+.vertical{
+    display: flex;
+    flex-direction: column;
+}
+.btn{
+    margin: 0 10px 0 10px;
+}
+.modal{
+    background-color: rgba(0,0,0,0.5);
+}
+.useredit{
+    overflow: auto;
+}

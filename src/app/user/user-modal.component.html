@@ -1,0 +1,51 @@
+<div class="modal fade in useredit">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button (click)="closeEdit()" class="close">
+          <span>×</span>
+        </button>
+        <h3 class="modal-title">
+          {{user.sname}} {{user.name}} {{user.mname}}
+        </h3>
+      </div>
+      <div class="modal-body">
+        <div class="vertical">
+
+          <div class="horizontal">
+            <div class="form-group">
+              <div class="input-group">
+                <h4 class="example-title">Имя</h4>
+                <input [(ngModel)]="user.name" class="form-control">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <h4 class="example-title">Фамилия</h4>
+                <input [(ngModel)]="user.sname" class="form-control">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <h4 class="example-title">Отчество</h4>
+                <input [(ngModel)]="user.mname" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="horizontal">
+            <groups class="col-sm-12" [user]="user"></groups>
+          </div>
+
+          <div class="horizontal">
+            <roles class="col-sm-12" [user]="user"></roles>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button (click)="save(user)" class="btn btn-primary">Сохранить</button>
+          <button (click)="closeEdit()" class="btn btn-default">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

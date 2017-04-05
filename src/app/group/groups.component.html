@@ -1,0 +1,25 @@
+<h4 class="page-header">{{title}}</h4>
+<table class="table table-striped table-hover">
+  <thead>
+    <th class="col-sm-4 text-center">#</th>
+    <th class="col-sm-4">Название</th>
+    <th></th>
+  </thead>
+  <tbody>
+    <tr *ngFor="let group of groups">
+      <td class="text-center">{{group.id}}</td>
+      <td>{{group.name}}</td>
+      <td>
+        <div>
+          <button class="btn btn-default btn-sm" (click)="edit(group)" title="Редактировать"><span class="fa fa-pencil-square-o"></span></button>
+          <button class="btn btn-default btn-sm" (click)="delete(group, user)" title="Удалить"><span class="fa fa-remove"></span></button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<button class="btn btn-primary" (click)="addUserGroup()"><span class="fa fa-plus"></span>  Добавить</button>
+<button class="btn btn-default" (click)="addGroup()">Создать группу</button>
+<newusergroup *ngIf="newUserGroup" [user]="user"></newusergroup>
+<newgroup *ngIf="newGroup"></newgroup>
+<editgroup *ngIf="editGroup" [group]="selectedGroup"></editgroup>
