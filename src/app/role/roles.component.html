@@ -1,6 +1,0 @@
-<h4 class="page-header">{{title}}</h4>
-<div *ngFor="let role of checkboxes" roles>
-  <input #roleCheckbox type="checkbox" name="{{role.role.name}}" 
-  checked="{{role.checked}}" (click)="changed(role.role, roleCheckbox.checked)">
-  <label for="{{role.role.name}}">{{role.role.name}}</label>
-</div>
