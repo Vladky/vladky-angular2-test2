@@ -5,8 +5,6 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { UserService } from './user/user.service';
 import { UsersComponent } from './user/users.component';
-import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
-import { InMemoryDataService,  } from './in-memory-data.service';
 import { UserModalComponent } from './user/user-modal.component';
 import { GroupsComponent } from './group/groups.component';
 import { GroupService } from './group/group.service';
