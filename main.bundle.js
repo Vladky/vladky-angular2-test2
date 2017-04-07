@@ -30,14 +30,16 @@ var GroupsComponent = (function () {
     }
     GroupsComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.groups = [];
         this.groupService.getByUser(this.user)
-            .then(function (gropus) {
-            _this.groups = gropus;
+            .forEach(function (group) {
+            _this.groups.push(group);
         });
     };
     GroupsComponent.prototype.delete = function (group, user) {
         var _this = this;
         this.groupService.deleteUserGroup(group, user)
+            .forEach(function () { })
             .then(function () {
             var g = _this.groups.find(function (x) { return x.id == group.id; });
             var index = _this.groups.indexOf(g, 0);
@@ -180,8 +182,14 @@ var UsersComponent = (function () {
     };
     UsersComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.userService.getAll()
-            .then(function (users) { return _this.users = users; });
+        // this.userService.getAll()
+        //     .then(users => this.users = users);
+        this.users = [];
+        this.userService.getAll().forEach(function (user) {
+            _this.users.push(user);
+        }).then(function (x) {
+            console.log("Users are ready");
+        });
     };
     UsersComponent.prototype.gotoDetail = function () {
         // this.router.navigate(['/user-detail', this.selected.id]);
@@ -197,9 +205,8 @@ var UsersComponent = (function () {
     };
     UsersComponent.prototype.add = function (user) {
         var _this = this;
-        this.userService.create(user)
-            .then(function (user) {
-            // this.users.push(user);
+        this.userService.create(user).forEach(function (user) {
+            _this.users.push(user);
             _this.selected = null;
         });
     };
@@ -207,11 +214,13 @@ var UsersComponent = (function () {
         var _this = this;
         this.userService
             .delete(user.id)
+            .forEach(function () { })
             .then(function () {
-            _this.users = _this.users.filter(function (h) { return h !== user; });
+            _this.users = _this.users.filter(function (u) { return u !== user; });
             if (_this.selected === user) {
                 _this.selected = null;
             }
+            console.log(_this.users);
         });
     };
     UsersComponent.prototype.closeEdit = function () {
@@ -254,6 +263,8 @@ var Group = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_app_mock__ = __webpack_require__(202);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_app_models_userrole__ = __webpack_require__(465);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return RoleService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -267,14 +278,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var RoleService = (function () {
     function RoleService() {
     }
     RoleService.prototype.getAll = function () {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_1_app_mock__["a" /* ROLES */]);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            for (var _i = 0, ROLES_1 = __WEBPACK_IMPORTED_MODULE_1_app_mock__["a" /* ROLES */]; _i < ROLES_1.length; _i++) {
+                var role = ROLES_1[_i];
+                o.next(role);
+            }
+            o.complete();
+        });
     };
     RoleService.prototype.get = function (id) {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_1_app_mock__["a" /* ROLES */].find(function (x) { return x.id == id; }));
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) { return o.next(__WEBPACK_IMPORTED_MODULE_1_app_mock__["a" /* ROLES */].find(function (x) { return x.id == id; })); });
     };
     RoleService.prototype.getByUser = function (user) {
         var res, userRole;
@@ -284,7 +302,14 @@ var RoleService = (function () {
                 res.push(__WEBPACK_IMPORTED_MODULE_1_app_mock__["b" /* USER_ROLES */][ur].role);
             }
         }
-        return Promise.resolve(res);
+        console.log(res);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            for (var _i = 0, res_1 = res; _i < res_1.length; _i++) {
+                var r = res_1[_i];
+                o.next(r);
+            }
+            o.complete();
+        });
     };
     RoleService.prototype.removeUserRole = function (user, role) {
         var userRole = __WEBPACK_IMPORTED_MODULE_1_app_mock__["b" /* USER_ROLES */].find(function (x) { return x.role == role && x.user == user; });
@@ -292,7 +317,9 @@ var RoleService = (function () {
         if (index > -1) {
             __WEBPACK_IMPORTED_MODULE_1_app_mock__["b" /* USER_ROLES */].splice(index, 1);
         }
-        return Promise.resolve();
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.complete();
+        });
     };
     RoleService.prototype.addUserRole = function (role, user) {
         var userRole = new __WEBPACK_IMPORTED_MODULE_2_app_models_userrole__["a" /* UserRole */]();
@@ -300,11 +327,14 @@ var RoleService = (function () {
         userRole.user = user;
         this.generateId(userRole);
         __WEBPACK_IMPORTED_MODULE_1_app_mock__["b" /* USER_ROLES */].push(userRole);
-        return Promise.resolve(userRole);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.next(userRole);
+            o.complete();
+        });
     };
     RoleService.prototype.max = function (values) {
         var max;
-        max = values[0];
+        max = 0;
         for (var v in values) {
             if (values[v] > max)
                 max = values[v];
@@ -333,6 +363,8 @@ var RoleService = (function () {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mock__ = __webpack_require__(202);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UserService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -345,6 +377,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var UserService = (function () {
     function UserService() {
     }
@@ -354,16 +387,29 @@ var UserService = (function () {
     };
     ;
     UserService.prototype.getAll = function () {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */]);
+        // return Promise.resolve(USERS);
+        return new __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"](function (observer) {
+            for (var _i = 0, USERS_1 = __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */]; _i < USERS_1.length; _i++) {
+                var user = USERS_1[_i];
+                observer.next(user);
+            }
+            observer.complete();
+        });
     };
     UserService.prototype.get = function (id) {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].find(function (x) { return x.id == id; }));
+        return new __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"](function (o) {
+            o.next(__WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].find(function (x) { return x.id == id; }));
+            o.complete();
+        });
     };
     ;
     UserService.prototype.create = function (user) {
         this.generateId(user);
         __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].push(user);
-        return Promise.resolve(user);
+        return new __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"](function (o) {
+            o.next(user);
+            o.complete();
+        });
     };
     ;
     UserService.prototype.update = function (user) {
@@ -372,17 +418,26 @@ var UserService = (function () {
                 __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */][i] = user;
             }
         }
-        return Promise.resolve(user);
+        return new __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"](function (o) {
+            o.next(user);
+            o.complete();
+        });
     };
     ;
     UserService.prototype.delete = function (id) {
-        __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].filter(function (x) { return x.id != id; });
-        return Promise.resolve();
+        var u = __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].find(function (x) { return x.id == id; });
+        var index = __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].indexOf(u, 0);
+        if (index > -1) {
+            console.log("splice");
+            __WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */].splice(index, 1);
+        }
+        console.log(__WEBPACK_IMPORTED_MODULE_1__mock__["e" /* USERS */]);
+        return this.getAll();
     };
     ;
     UserService.prototype.max = function (values) {
         var max;
-        max = values[0];
+        max = 0;
         for (var v in values) {
             if (values[v] > max)
                 max = values[v];
@@ -697,9 +752,11 @@ var NewUserGroupComponent = (function () {
     }
     NewUserGroupComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.groups = [];
         this.groupService.getAll()
-            .then(function (res) {
-            _this.groups = res;
+            .forEach(function (res) {
+            _this.groups.push(res);
+        }).then(function () {
             _this.group = _this.groups[0];
         });
         this.userFullName = this.user.sname + " " + this.user.name + " " + this.user.mname;
@@ -707,7 +764,7 @@ var NewUserGroupComponent = (function () {
     NewUserGroupComponent.prototype.changeGroup = function (id) {
         var _this = this;
         this.groupService.get(id)
-            .then(function (x) { return _this.group = x; });
+            .forEach(function (x) { return _this.group = x; });
     };
     NewUserGroupComponent.prototype.close = function () {
         this.groupsComponent.newUserGroup = false;
@@ -715,7 +772,7 @@ var NewUserGroupComponent = (function () {
     NewUserGroupComponent.prototype.save = function () {
         var _this = this;
         this.groupService.addUserGroup(this.group, this.user)
-            .then(function (x) {
+            .forEach(function (x) {
             _this.groupsComponent.groups.push(x.group);
         });
         this.close();
@@ -774,6 +831,8 @@ var UserRole = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_app_models_user__ = __webpack_require__(95);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_app_role_role_service__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
 /* unused harmony export RoleCheckbox */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return RolesComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -785,6 +844,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
 
 
 
@@ -800,31 +860,39 @@ var RolesComponent = (function () {
     }
     RolesComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.roles = [];
         this.checkboxes = [];
+        this.selectedRoles = [];
         this.roleService.getAll()
-            .then(function (x) {
-            _this.roles = x;
-            for (var i = 0; i < _this.roles.length; i++) {
-                _this.checkboxes[i] = new RoleCheckbox();
-                _this.checkboxes[i].role = _this.roles[i];
-                _this.roleService.getByUser(_this.user)
-                    .then(function (x) {
-                    _this.selectedRoles = x;
-                    var ids = x.map(function (x) { return x.id; });
-                    for (var i = 0; i < _this.checkboxes.length; i++) {
-                        if (ids.indexOf(_this.checkboxes[i].role.id) > -1) {
-                            _this.checkboxes[i].checked = true;
-                        }
+            .forEach(function (x) {
+            _this.roles.push(x);
+        }).then(function () {
+            _this.fullSelectedRoles().forEach(function (o) { }).then(function () {
+                var ids = _this.selectedRoles.map(function (x) { return x.id; });
+                for (var i = 0; i < _this.checkboxes.length; i++) {
+                    if (ids.indexOf(_this.checkboxes[i].role.id) > -1) {
+                        _this.checkboxes[i].checked = true;
                     }
-                });
-            }
-            ;
+                }
+            });
+        });
+    };
+    ;
+    RolesComponent.prototype.fullSelectedRoles = function () {
+        var _this = this;
+        for (var i = 0; i < this.roles.length; i++) {
+            this.checkboxes[i] = new RoleCheckbox();
+            this.checkboxes[i].role = this.roles[i];
+        }
+        this.roleService.getByUser(this.user)
+            .forEach(function (x) {
+            _this.selectedRoles.push(x);
+        });
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.complete();
         });
     };
     RolesComponent.prototype.changed = function (role, value) {
-        console.log("changed");
-        console.log(role);
-        console.log(value);
         if (value) {
             this.roleService.addUserRole(role, this.user);
         }
@@ -1085,7 +1153,7 @@ module.exports = "<div class=\"modal fade in\">\r\n  <div class=\"modal-dialog m
 /***/ 638:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"modal fade in useredit\">\r\n  <div class=\"modal-dialog modal-lg\">\r\n    <div class=\"modal-content\">\r\n      <div class=\"modal-header\">\r\n        <button (click)=\"closeEdit()\" class=\"close\">\r\n          <span>×</span>\r\n        </button>\r\n        <h3 class=\"modal-title\">\r\n          {{user.sname}} {{user.name}} {{user.mname}}\r\n        </h3>\r\n      </div>\r\n      <div class=\"modal-body\">\r\n        <div class=\"vertical\">\r\n\r\n          <div class=\"horizontal\">\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Имя</h4>\r\n                <input [(ngModel)]=\"user.name\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Фамилия</h4>\r\n                <input [(ngModel)]=\"user.sname\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Отчество</h4>\r\n                <input [(ngModel)]=\"user.mname\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"horizontal\">\r\n            <groups class=\"col-sm-12\" [user]=\"user\"></groups>\r\n          </div>\r\n\r\n          <div class=\"horizontal\">\r\n            <roles class=\"col-sm-12\" [user]=\"user\"></roles>\r\n          </div>\r\n        </div>\r\n        <div class=\"modal-footer\">\r\n          <button (click)=\"save(user)\" class=\"btn btn-primary\">Сохранить</button>\r\n          <button (click)=\"closeEdit()\" class=\"btn btn-default\">Отмена</button>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>"
+module.exports = "<div class=\"modal fade in useredit\">\r\n  <div class=\"modal-dialog modal-lg\">\r\n    <div class=\"modal-content\">\r\n      <div class=\"modal-header\">\r\n        <button (click)=\"closeEdit()\" class=\"close\">\r\n          <span>×</span>\r\n        </button>\r\n        <h3 class=\"modal-title\">\r\n          {{user.sname}} {{user.name}} {{user.mname}}\r\n        </h3>\r\n      </div>\r\n      <div class=\"modal-body\">\r\n        <div class=\"vertical\">\r\n          <div class=\"horizontal\">\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Фамилия</h4>\r\n                <input [(ngModel)]=\"user.sname\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Имя</h4>\r\n                <input [(ngModel)]=\"user.name\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n              <div class=\"input-group\">\r\n                <h4 class=\"example-title\">Отчество</h4>\r\n                <input [(ngModel)]=\"user.mname\" class=\"form-control\">\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"horizontal\">\r\n            <groups class=\"col-sm-12\" [user]=\"user\"></groups>\r\n          </div>\r\n\r\n          <div class=\"horizontal\">\r\n            <roles class=\"col-sm-12\" [user]=\"user\"></roles>\r\n          </div>\r\n        </div>\r\n        <div class=\"modal-footer\">\r\n          <button (click)=\"save(user)\" class=\"btn btn-primary\">Сохранить</button>\r\n          <button (click)=\"closeEdit()\" class=\"btn btn-default\">Отмена</button>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
@@ -1111,6 +1179,8 @@ module.exports = __webpack_require__(351);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__models_usergroup__ = __webpack_require__(464);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mock__ = __webpack_require__(202);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return GroupService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1124,6 +1194,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var GroupService = (function () {
     function GroupService() {
     }
@@ -1133,10 +1204,18 @@ var GroupService = (function () {
     };
     ;
     GroupService.prototype.getAll = function () {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */]);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            for (var _i = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */]; _i < GROUPS_1.length; _i++) {
+                var g = GROUPS_1[_i];
+                o.next(g);
+            }
+        });
     };
     GroupService.prototype.get = function (id) {
-        return Promise.resolve(__WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */].find(function (x) { return x.id == id; }));
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.next(__WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */].find(function (x) { return x.id == id; }));
+            o.complete();
+        });
     };
     ;
     GroupService.prototype.getByUser = function (user) {
@@ -1147,13 +1226,22 @@ var GroupService = (function () {
                 res.push(__WEBPACK_IMPORTED_MODULE_2__mock__["d" /* USER_GROUPS */][ug].group);
             }
         }
-        return Promise.resolve(res);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            for (var _i = 0, res_1 = res; _i < res_1.length; _i++) {
+                var r = res_1[_i];
+                o.next(r);
+            }
+            o.complete();
+        });
     };
     ;
     GroupService.prototype.create = function (group) {
         this.generateId(group);
         __WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */].push(group);
-        return Promise.resolve(group);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.next(group);
+            o.complete();
+        });
     };
     ;
     GroupService.prototype.update = function (group) {
@@ -1162,12 +1250,14 @@ var GroupService = (function () {
                 __WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */][i] = group;
             }
         }
-        return Promise.resolve(group);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) { return o.next(group); });
     };
     ;
     GroupService.prototype.delete = function (id) {
         __WEBPACK_IMPORTED_MODULE_2__mock__["c" /* GROUPS */].filter(function (x) { return x.id != id; });
-        return Promise.resolve();
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.complete();
+        });
     };
     ;
     GroupService.prototype.deleteUserGroup = function (group, user) {
@@ -1176,7 +1266,9 @@ var GroupService = (function () {
         if (index > -1) {
             __WEBPACK_IMPORTED_MODULE_2__mock__["d" /* USER_GROUPS */].splice(index, 1);
         }
-        return Promise.resolve();
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.complete();
+        });
     };
     GroupService.prototype.addUserGroup = function (group, user) {
         console.log(group);
@@ -1185,11 +1277,14 @@ var GroupService = (function () {
         userGroup.user = user;
         this.generateIdforUserGroup(userGroup);
         __WEBPACK_IMPORTED_MODULE_2__mock__["d" /* USER_GROUPS */].push(userGroup);
-        return Promise.resolve(userGroup);
+        return new __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"](function (o) {
+            o.next(userGroup);
+            o.complete();
+        });
     };
     GroupService.prototype.max = function (values) {
         var max;
-        max = values[0];
+        max = 0;
         for (var v in values) {
             if (values[v] > max)
                 max = values[v];
