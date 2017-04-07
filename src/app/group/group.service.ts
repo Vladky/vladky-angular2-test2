@@ -3,6 +3,7 @@ import { Group } from '../models/group';
 import { User } from '../models/user';
 import { UserGroup } from '../models/usergroup';
 import { GROUPS, USER_GROUPS } from "../mock"
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class GroupService {
@@ -13,13 +14,19 @@ export class GroupService {
 
   constructor() { };
 
-  getAll(): Promise<Group[]> {
-    return Promise.resolve(GROUPS);
+  getAll(): Observable<Group> {
+    return new Observable(o => {
+      for (let g of GROUPS)
+        o.next(g);
+    });
   }
-  get(id: number): Promise<Group> {
-    return Promise.resolve(GROUPS.find(x => x.id == id));
+  get(id: number): Observable<Group> {
+    return new Observable(o => {
+      o.next(GROUPS.find(x => x.id == id))
+      o.complete();
+    });
   };
-  getByUser(user: User): Promise<Group[]> {
+  getByUser(user: User): Observable<Group> {
     var res: Group[], userGroups: UserGroup;
     res = Array<Group>();
     for (let ug in USER_GROUPS) {
@@ -27,45 +34,60 @@ export class GroupService {
         res.push(USER_GROUPS[ug].group);
       }
     }
-    return Promise.resolve(res);
+    return new Observable(o => {
+      for (let r of res) {
+        o.next(r);
+      }
+      o.complete();
+    });
   };
-  create(group: Group): Promise<Group> {
+  create(group: Group): Observable<Group> {
     this.generateId(group);
     GROUPS.push(group);
-    return Promise.resolve(group);
+    return new Observable(o => {
+      o.next(group);
+      o.complete();
+    });
   };
-  update(group: Group): Promise<Group> {
+  update(group: Group): Observable<Group> {
     for (var i in GROUPS) {
       if (GROUPS[i].id == group.id) {
         GROUPS[i] = group;
       }
     }
-    return Promise.resolve(group);
+    return new Observable(o => o.next(group));
   };
-  delete(id: number): Promise<void> {
+  delete(id: number): Observable<void> {
     GROUPS.filter(x => x.id != id);
-    return Promise.resolve();
+    return new Observable<void>(o => {
+      o.complete();
+    });
   };
-  deleteUserGroup(group: Group, user: User): Promise<void> {
+  deleteUserGroup(group: Group, user: User): Observable<void> {
     var ug = USER_GROUPS.find(x => x.group.id == group.id && x.user.id == user.id);
     var index = USER_GROUPS.indexOf(ug, 0);
     if (index > -1) {
       USER_GROUPS.splice(index, 1);
     }
-    return Promise.resolve();
+    return new Observable<void>(o => {
+      o.complete();
+    });
   }
-  addUserGroup(group: Group, user: User): Promise<UserGroup> {
+  addUserGroup(group: Group, user: User): Observable<UserGroup> {
     console.log(group);
     var userGroup = new UserGroup();
     userGroup.group = group;
     userGroup.user = user;
     this.generateIdforUserGroup(userGroup);
     USER_GROUPS.push(userGroup);
-    return Promise.resolve(userGroup);
+    return new Observable(o => {
+      o.next(userGroup)
+      o.complete();
+    });
   }
   private max(values: number[]): number {
     var max: number;
-    max = values[0];
+    max = 0;
     for (let v in values) {
       if (values[v] > max) max = values[v];
     }

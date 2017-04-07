@@ -24,8 +24,14 @@ export class UsersComponent implements OnInit {
         this.selected = user;
     }
     ngOnInit(): void {
-        this.userService.getAll()
-            .then(users => this.users = users);
+        // this.userService.getAll()
+        //     .then(users => this.users = users);
+        this.users = [];
+        this.userService.getAll().forEach(user => {
+            this.users.push(user);
+        }).then(x => {
+            console.log("Users are ready")
+        })
     }
     gotoDetail(): void {
         // this.router.navigate(['/user-detail', this.selected.id]);
@@ -40,20 +46,21 @@ export class UsersComponent implements OnInit {
         this.addForm = true;
     }
     add(user: User): void {
-        this.userService.create(user)
-            .then(user => {
-                // this.users.push(user);
-                this.selected = null;
-            })
+        this.userService.create(user).forEach(user => {
+            this.users.push(user);
+            this.selected = null;
+        });
     }
     delete(user: User): void {
         this.userService
             .delete(user.id)
+            .forEach(() => { })
             .then(() => {
-                this.users = this.users.filter(h => h !== user);
+                this.users = this.users.filter(u => u !== user);
                 if (this.selected === user) {
                     this.selected = null;
                 }
+                console.log(this.users);
             })
     }
     closeEdit(): void {

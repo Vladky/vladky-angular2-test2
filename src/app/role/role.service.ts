@@ -3,18 +3,24 @@ import { Role } from "app/models/role";
 import { ROLES, USER_ROLES } from "app/mock";
 import { User } from "app/models/user";
 import { UserRole } from "app/models/userrole";
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class RoleService {
 
   constructor() { }
-  getAll(): Promise<Role[]> {
-    return Promise.resolve(ROLES);
+  getAll(): Observable<Role> {
+    return new Observable(o => {
+      for (let role of ROLES) {
+        o.next(role);
+      }
+      o.complete();
+    });
   }
-  get(id: number): Promise<Role> {
-    return Promise.resolve(ROLES.find(x => x.id == id));
+  get(id: number): Observable<Role> {
+    return new Observable(o => o.next(ROLES.find(x => x.id == id)));
   }
-  getByUser(user: User): Promise<Role[]> {
+  getByUser(user: User): Observable<Role> {
     var res: Role[], userRole: UserRole;
     res = Array<Role>();
     for (let ur in USER_ROLES) {
@@ -22,27 +28,38 @@ export class RoleService {
         res.push(USER_ROLES[ur].role);
       }
     }
-    return Promise.resolve(res);
+    console.log(res);
+    return new Observable(o => {
+      for (let r of res) {
+        o.next(r);
+      }
+      o.complete();
+    });
   }
-  removeUserRole(user: User, role: Role): Promise<void> {
+  removeUserRole(user: User, role: Role): Observable<void> {
     var userRole = USER_ROLES.find(x => x.role == role && x.user == user);
     var index = USER_ROLES.indexOf(userRole, 0);
     if (index > -1) {
       USER_ROLES.splice(index, 1);
     }
-    return Promise.resolve();
+    return new Observable<void>(o => {
+      o.complete();
+    });
   }
-  addUserRole(role: Role, user: User): Promise<UserRole> {
+  addUserRole(role: Role, user: User): Observable<UserRole> {
     var userRole = new UserRole();
     userRole.role = role;
     userRole.user = user;
     this.generateId(userRole);
     USER_ROLES.push(userRole);
-    return Promise.resolve(userRole);
+    return new Observable(o => {
+      o.next(userRole);
+      o.complete();
+    });
   }
   private max(values: number[]): number {
     var max: number;
-    max = values[0];
+    max = 0;
     for (let v in values) {
       if (values[v] > max) max = values[v];
     }

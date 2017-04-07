@@ -21,9 +21,11 @@ export class NewUserGroupComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.groups = [];
     this.groupService.getAll()
-      .then(res => {
-        this.groups = res;
+      .forEach(res => {
+        this.groups.push(res);
+      }).then(() => {
         this.group = this.groups[0];
       });
     this.userFullName = this.user.sname + " " + this.user.name + " " + this.user.mname;
@@ -31,7 +33,7 @@ export class NewUserGroupComponent implements OnInit {
 
   changeGroup(id: number): void {
     this.groupService.get(id)
-      .then(x => this.group = x);
+      .forEach(x => this.group = x);
   }
 
   close(): void {
@@ -40,7 +42,7 @@ export class NewUserGroupComponent implements OnInit {
 
   save(): void {
     this.groupService.addUserGroup(this.group, this.user)
-      .then(x => {
+      .forEach(x => {
         this.groupsComponent.groups.push(x.group);
       })
     this.close();

@@ -21,14 +21,16 @@ export class GroupsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.groups = [];
     this.groupService.getByUser(this.user)
-      .then(gropus => {
-        this.groups = gropus
+      .forEach(group => {
+        this.groups.push(group);
       });
   }
 
   delete(group: Group, user: User): void {
     this.groupService.deleteUserGroup(group, user)
+      .forEach(() => { })
       .then(() => {
         var g = this.groups.find(x => x.id == group.id);
         var index = this.groups.indexOf(g, 0);

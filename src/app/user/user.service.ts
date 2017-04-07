@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/user';
 import { USERS } from "../mock"
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class UserService {
@@ -11,33 +12,53 @@ export class UserService {
 
   constructor() { };
 
-  getAll(): Promise<User[]> {
-    return Promise.resolve(USERS);
+  getAll(): Observable<User> {
+    // return Promise.resolve(USERS);
+    return new Observable(observer => {
+      for (let user of USERS) {
+        observer.next(user);
+      }
+      observer.complete();
+    });
   }
-  get(id: number): Promise<User> {
-    return Promise.resolve(USERS.find(x => x.id == id));
+  get(id: number): Observable<User> {
+    return new Observable(o => {
+      o.next(USERS.find(x => x.id == id));
+      o.complete();
+    });
   };
-  create(user: User): Promise<User> {
+  create(user: User): Observable<User> {
     this.generateId(user);
-    USERS.push(user);
-    return Promise.resolve(user);
+    USERS.push(user); return new Observable(o => {
+      o.next(user);
+      o.complete();
+    });
   };
-  update(user: User): Promise<User> {
+  update(user: User): Observable<User> {
     for (var i in USERS) {
       if (USERS[i].id == user.id) {
         USERS[i] = user;
       }
     }
-    return Promise.resolve(user);
+    return new Observable(o => {
+      o.next(user);
+      o.complete();
+    });
   };
-  delete(id: number): Promise<void> {
-    USERS.filter(x => x.id != id);
-    return Promise.resolve();
+  delete(id: number): Observable<User> {
+    var u = USERS.find(x => x.id == id);
+    var index = USERS.indexOf(u, 0);
+    if (index > -1) {
+      console.log("splice")
+      USERS.splice(index, 1);
+    }
+    console.log(USERS);
+    return this.getAll();
   };
 
   private max(values: number[]): number {
     var max: number;
-    max = values[0];
+    max = 0;
     for (let v in values) {
       if (values[v] > max) max = values[v];
     }
