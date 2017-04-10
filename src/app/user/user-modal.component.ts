@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { UsersComponent } from './users.component';
 import { User } from '../models/user'
+import { UserService } from "app/user/user.service";
 
 @Component({
   selector: 'user-modal',
@@ -13,6 +14,7 @@ export class UserModalComponent implements OnInit {
   old: User;
   constructor(
     private usersComponent: UsersComponent,
+    private userService: UserService,
   ) { }
 
   ngOnInit() {
@@ -30,7 +32,7 @@ export class UserModalComponent implements OnInit {
     this.usersComponent.closeEdit();
   }
   save(user: User): void {
-    this.usersComponent.edit(user);
+    this.userService.update(user);
     this.usersComponent.closeEdit();
   }
 }

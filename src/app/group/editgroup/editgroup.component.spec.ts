@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { EditgroupComponent } from './editgroup.component';
+import { EditGroupComponent } from './editgroup.component';
 
-describe('EditgroupComponent', () => {
-  let component: EditgroupComponent;
-  let fixture: ComponentFixture<EditgroupComponent>;
+describe('EditGroupComponent', () => {
+  let component: EditGroupComponent;
+  let fixture: ComponentFixture<EditGroupComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditgroupComponent ]
+      declarations: [ EditGroupComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditgroupComponent);
+    fixture = TestBed.createComponent(EditGroupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

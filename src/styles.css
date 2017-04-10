@@ -46,3 +46,6 @@ textarea:focus, input:focus, button:focus, span:focus{
 .useredit{
     overflow: auto;
 }
+input[type="checkbox"]{
+    cursor: pointer;
+}
