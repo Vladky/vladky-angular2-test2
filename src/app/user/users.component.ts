@@ -7,6 +7,7 @@ import { UserModalComponent } from './user-modal.component';
 import * as _ from "lodash";
 import { Observable } from "rxjs/Observable";
 import "rxjs/Rx";
+import { Http } from "@angular/http";
 
 @Component({
     selector: 'users',
@@ -21,14 +22,14 @@ export class UsersComponent implements OnInit {
     addForm = false;
     constructor(
         private userService: UserService,
+        private http: Http
     ) { }
 
     onselect(user: User): void {
         this.selected = user;
     }
     ngOnInit(): void {
-        this.userService.users
-            .subscribe(users => this.users = users);
+        this.userService.users$.subscribe(users => this.users = users);
     }
     gotoDetail(): void {
         // this.router.navigate(['/user-detail', this.selected.id]);
@@ -46,8 +47,7 @@ export class UsersComponent implements OnInit {
         this.userService.create(user)
     }
     delete(user: User): void {
-        this.userService
-            .delete(user.id)
+        this.userService.delete(user.id)
     }
     closeEdit(): void {
         this.editableUser = null;

@@ -4,57 +4,59 @@ import { USERS } from "../mock"
 import { Observable } from "rxjs/Observable";
 import { } from "rxjs/*";
 import * as _ from "lodash";
-import { Subscriber } from "rxjs/Subscriber";
+import { Http, Headers, Response } from "@angular/http";
+import 'rxjs/add/operator/map';
+import { EventEmitter } from "events";
+import { Subject } from "rxjs/Subject";
 
 @Injectable()
 export class UserService {
-  users: Observable<User[]>;
+  private url = "http://58ec56937c2be2120024f164.mockapi.io/users";
+  private headers = new Headers({ 'Content-Type': 'application/json' });
+  public users$ = new Subject<User[]>();
 
-  constructor() {
-    this.users = this.getAll();
+  constructor(
+    private http: Http,
+  ) {
+    this.refresh();
   };
 
+  refresh(): void {
+    this.getAll().subscribe(x => {
+      console.log(x);
+      this.users$.next(x);
+    });
+  }
+
   getAll(): Observable<User[]> {
-    return Observable.create((observer: Subscriber<any>) => {
-      observer.next(USERS);
-      observer.complete
-    });
+    return this.http.get(this.url, { headers: this.headers })
+      .map((resp: Response) => resp.json());
   }
 
-  get(id: number): Observable<User> {
-    return new Observable(o => {
-      o.next(USERS.find(x => x.id == id));
-      o.complete();
-    });
+  get(id: number): void {
+    let newUrl = this.url + "/" + id;
+    this.http.get(this.url, { headers: this.headers })
+      .map((resp: Response) => resp.json());
   }
 
-  create(user: User): Observable<User> {
-    this.generateId(user);
-    USERS.push(user); return new Observable(o => {
-      o.next(user);
-      o.complete();
-    });
+  create(user: User): void {
+    this.http.post(this.url, JSON.stringify(user), { headers: this.headers })
+      .toPromise();
+    this.refresh();
   }
 
-  update(user: User): Observable<User> {
-    for (var i in USERS) {
-      if (USERS[i].id == user.id) {
-        USERS[i] = user;
-      }
-    }
-    return new Observable(o => {
-      o.next(user);
-      o.complete();
-    });
+  update(user: User): void {
+    let newUrl = this.url + "/" + user.id;
+    this.http.put(newUrl, JSON.stringify(user), { headers: this.headers })
+      .toPromise();
+    this.refresh();
   }
 
-  delete(id: number): Observable<User[]> {
-    var u = USERS.find(x => x.id == id);
-    var index = USERS.indexOf(u, 0);
-    if (index > -1) {
-      USERS.splice(index, 1);
-    }
-    return this.getAll();
+  delete(id: number): void {
+    let newUrl = this.url + "/" + id;
+    this.http.delete(newUrl, { headers: this.headers })
+      .toPromise();
+    this.refresh();
   }
 
   private max(values: number[]): number {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from "app/models/user";
 import { UsersComponent } from "app/user/users.component";
+import { UserService } from "app/user/user.service";
 
 @Component({
   selector: 'newuser',
@@ -12,6 +13,7 @@ export class NewuserComponent implements OnInit {
   user: User;
   constructor(
     private userComponent: UsersComponent,
+    private userService: UserService,
   ) { }
 
   ngOnInit() {
@@ -21,7 +23,7 @@ export class NewuserComponent implements OnInit {
     this.userComponent.addForm = false;
   }
   save(user: User): void {
-    this.userComponent.add(user);
+    this.userService.create(user);
     this.close();
   }
 }
