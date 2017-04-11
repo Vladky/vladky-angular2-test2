@@ -29,6 +29,7 @@ export class UsersComponent implements OnInit {
         this.selected = user;
     }
     ngOnInit(): void {
+        this.userService.getAll();
         this.userService.users$.subscribe(users => this.users = users);
     }
     gotoDetail(): void {
