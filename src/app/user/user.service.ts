@@ -10,9 +10,10 @@ import { Subject } from "rxjs/Subject";
 
 @Injectable()
 export class UserService {
-  private url = "http://58ec56937c2be2120024f164.mockapi.io/users";
+  private url = "https://58ec56937c2be2120024f164.mockapi.io/users";
   private headers = new Headers({ 'Content-Type': 'application/json' });
   public users$ = new Subject<User[]>();
+  public $users = new Observable<User[]>();
   public users: User[] = [];
 
   constructor(
@@ -24,15 +25,17 @@ export class UserService {
       .map((resp: Response) => resp.json())
       .subscribe((users: User[]) => {
         this.users = users;
-        console.log(this.users);
         this.users$.next(this.users);
       });
   }
 
-  get(id: number): void {
+  get(id: number): User {
     let newUrl = this.url + "/" + id;
+    let res: User;
     this.http.get(this.url, { headers: this.headers })
-      .map((resp: Response) => resp.json());
+      .map((resp: Response) => resp.json() as User)
+      .subscribe(user => res = user);
+    return res;
   }
 
   create(user: User): void {

@@ -3,6 +3,7 @@ import { User } from "app/models/user";
 import { Group } from "app/models/group";
 import { GroupService } from "app/group/group.service";
 import { GroupsComponent } from "app/group/groups.component";
+import { UserGroup } from "app/models/usergroup";
 
 @Component({
   selector: 'newusergroup',
@@ -22,18 +23,19 @@ export class NewUserGroupComponent implements OnInit {
 
   ngOnInit() {
     this.groups = [];
-    this.groupService.getAll()
-      .forEach(res => {
-        this.groups.push(res);
-      }).then(() => {
+    this.groupService.getAll();
+    this.groupService.groups$.subscribe(x => {
+      this.groups = x
+      if (this.groups.length > 0) {
         this.group = this.groups[0];
-      });
+      }
+    });
     this.userFullName = this.user.sname + " " + this.user.name + " " + this.user.mname;
+
   }
 
   changeGroup(id: number): void {
-    this.groupService.get(id)
-      .forEach(x => this.group = x);
+    this.group = this.groupService.get(id);
   }
 
   close(): void {
@@ -41,10 +43,10 @@ export class NewUserGroupComponent implements OnInit {
   }
 
   save(): void {
-    this.groupService.addUserGroup(this.group, this.user)
-      .forEach(x => {
-        this.groupsComponent.groups.push(x.group);
-      })
+    let userGroup = new UserGroup();
+    userGroup.group = this.group;
+    userGroup.user = this.user;
+    this.groupService.addUserGroup(userGroup);
     this.close();
   }
 

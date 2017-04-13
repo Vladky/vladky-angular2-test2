@@ -4,71 +4,92 @@ import { ROLES, USER_ROLES } from "app/mock";
 import { User } from "app/models/user";
 import { UserRole } from "app/models/userrole";
 import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
+import { Http, Headers, Response } from "@angular/http";
+
+export class UserRoleModel {
+  id: number;
+  roleId: number;
+  userId: number;
+  set(userRole: UserRole): void {
+    this.id = userRole.id;
+    this.userId = userRole.user.id;
+    this.roleId = userRole.role.id;
+  }
+}
 
 @Injectable()
 export class RoleService {
+  private users: User[] = [];
+  private roles: Role[] = [];
+  private userRoles: UserRole[] = [];
+  public roles$ = new Subject<Role[]>();
+  public userRoles$ = new Subject<UserRole[]>();
+  private rolesUrl = "http://58ec56937c2be2120024f164.mockapi.io/role";
+  private userRolesUrl = "http://58ec56937c2be2120024f164.mockapi.io/userrole";
+  private usersUrl = "http://58ec56937c2be2120024f164.mockapi.io/users";
+  private headers = new Headers({ 'Content-Type': 'application/json' });
 
-  constructor() { }
-  getAll(): Observable<Role> {
-    return new Observable(o => {
-      for (let role of ROLES) {
-        o.next(role);
-      }
-      o.complete();
-    });
+  constructor(
+    private http: Http
+  ) { }
+
+  getAll(): void {
+    this.http.get(this.usersUrl)
+      .map(resp => resp.json())
+      .subscribe(res => {
+        this.users = res;
+      });
+
+    this.http.get(this.rolesUrl, { headers: this.headers })
+      .map(resp => resp.json() as Role[])
+      .subscribe(data => {
+        this.roles = data;
+        this.roles$.next(this.roles);
+      });
+
+    setTimeout(() => {
+      this.http.get(this.userRolesUrl, { headers: this.headers })
+        .map(resp => resp.json() as UserRoleModel[])
+        .subscribe(data => {
+          this.userRoles = [];
+          data.forEach(element => {
+            let userRole = new UserRole();
+            userRole.id = element.id;
+            userRole.role = this.roles.find(x => x.id == element.roleId);
+            userRole.user = this.users.find(x => x.id == element.userId);
+            this.userRoles.push(userRole);
+          });
+          this.userRoles$.next(this.userRoles);
+        })
+    }, 200)
+  };
+
+  get(id: number): Role {
+    return this.roles.find(x => x.id == id);
   }
-  get(id: number): Observable<Role> {
-    return new Observable(o => o.next(ROLES.find(x => x.id == id)));
+
+  getByUser(user: User): Role[] {
+    return this.userRoles.filter(x => x.user.id == user.id)
+      .map(x => x.role);
   }
-  getByUser(user: User): Observable<Role> {
-    var res: Role[], userRole: UserRole;
-    res = Array<Role>();
-    for (let ur in USER_ROLES) {
-      if (USER_ROLES[ur].user.id == user.id) {
-        res.push(USER_ROLES[ur].role);
-      }
-    }
-    console.log(res);
-    return new Observable(o => {
-      for (let r of res) {
-        o.next(r);
-      }
-      o.complete();
-    });
-  }
-  removeUserRole(user: User, role: Role): Observable<void> {
-    var userRole = USER_ROLES.find(x => x.role == role && x.user == user);
-    var index = USER_ROLES.indexOf(userRole, 0);
-    if (index > -1) {
-      USER_ROLES.splice(index, 1);
-    }
-    return new Observable<void>(o => {
-      o.complete();
-    });
-  }
-  addUserRole(role: Role, user: User): Observable<UserRole> {
-    var userRole = new UserRole();
-    userRole.role = role;
-    userRole.user = user;
-    this.generateId(userRole);
-    USER_ROLES.push(userRole);
-    return new Observable(o => {
-      o.next(userRole);
-      o.complete();
-    });
-  }
-  private max(values: number[]): number {
-    var max: number;
-    max = 0;
-    for (let v in values) {
-      if (values[v] > max) max = values[v];
-    }
-    return max;
-  }
-  private generateId(userRole: UserRole): void {
-    var ids: number[];
-    ids = USER_ROLES.map(x => x.id);
-    var id = this.max(ids);
-    userRole.id = id + 1;
+
+  removeUserRole(id: number): void {
+    let url = this.userRolesUrl + "/" + id;
+    this.http.get(url, { headers: this.headers })
+      .map(resp => resp.json())
+      .subscribe(data => {
+        this.getAll();
+      });
+  };
+
+  addUserRole(userRole: UserRole): void {
+    let userRoleModel = new UserRoleModel();
+    userRoleModel.set(userRole);
+    this.http.post(this.userRolesUrl, JSON.stringify(userRoleModel), { headers: this.headers })
+      .map(resp => resp.json())
+      .subscribe(data => {
+        this.getAll();
+      });
   }
 }

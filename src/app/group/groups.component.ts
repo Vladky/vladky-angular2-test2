@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Inject } from '@angular/core';
 import { User } from "../models/user";
 import { Group } from "../models/group";
 import { GroupService } from "../group/group.service";
+import { UserGroup } from "app/models/usergroup";
 
 @Component({
   selector: 'groups',
@@ -11,7 +12,8 @@ import { GroupService } from "../group/group.service";
 export class GroupsComponent implements OnInit {
   title = "Группы пользователя";
   @Input() user: User;
-  groups: Group[];
+  groups: Group[] = [];
+  userGroups: UserGroup[] = [];
   newUserGroup = false;
   newGroup = false;
   editGroup = false;
@@ -21,23 +23,18 @@ export class GroupsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.groups = [];
-    this.groupService.getByUser(this.user)
-      .forEach(group => {
-        this.groups.push(group);
+    console.log(this.user);
+    this.groupService.getAll();
+    this.groupService.userGroups$.subscribe(
+      userGroups => {
+        this.userGroups = userGroups;
+        this.groups = userGroups.filter(userGroup => userGroup.user.id == this.user.id).map(x => x.group);
       });
   }
 
   delete(group: Group, user: User): void {
-    this.groupService.deleteUserGroup(group, user)
-      .forEach(() => { })
-      .then(() => {
-        var g = this.groups.find(x => x.id == group.id);
-        var index = this.groups.indexOf(g, 0);
-        if (index > -1) {
-          this.groups.splice(index, 1);
-        }
-      });
+    let userGroup = this.userGroups.find(x => x.user.id == user.id && x.group.id == group.id);
+    this.groupService.deleteUserGroup(userGroup.id);
   }
 
   addUserGroup(): void {

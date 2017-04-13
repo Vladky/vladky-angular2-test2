@@ -11,7 +11,7 @@ import { Http } from "@angular/http";
 
 @Component({
     selector: 'users',
-    providers: [UserService],
+    providers: [],
     templateUrl: './users.component.html',
 })
 export class UsersComponent implements OnInit {
@@ -22,7 +22,8 @@ export class UsersComponent implements OnInit {
     addForm = false;
     constructor(
         private userService: UserService,
-        private http: Http
+        private http: Http,
+        private us: UserService
     ) { }
 
     onselect(user: User): void {
@@ -30,13 +31,10 @@ export class UsersComponent implements OnInit {
     }
     ngOnInit(): void {
         this.userService.getAll();
-        this.userService.users$.subscribe(users => this.users = users);
-    }
-    gotoDetail(): void {
-        // this.router.navigate(['/user-detail', this.selected.id]);
-    }
-    createNew(): void {
-        // this.router.navigate(['/user-new']);
+        this.userService.users$.subscribe(users => {
+            this.users = users;
+            // console.log(this.users[0].constructor.name);
+        });
     }
     edit(user: User): void {
         this.editableUser = _.clone(user);
